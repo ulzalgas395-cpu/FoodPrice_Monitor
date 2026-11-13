@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+{% block title %}Excel импорт | FoodPrice{% endblock %}
+{% block page_name %}Excel деректерін жүктеу{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Excel арқылы деректер енгізу</h1>
+    <p>Бірнеше баға жазбасын бірден жүктеуге арналған құрал.</p>
+</div>
+
+<div class="panel">
+    <h3>Excel файлын таңдаңыз</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Файл (.xlsx немесе .xls)</label>
+        <input type="file" name="file" accept=".xlsx,.xls" required>
+
+        <button type="submit" class="primary-button">
+            Файлды жүктеу
+        </button>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>Excel файлының құрылымы</h3>
+
+    <p>Файлдың бірінші жолында төмендегі баған атаулары болуы қажет:</p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Баған</th>
+                    <th>Мысал</th>
+                    <th>Түсіндірме</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>product_id</td><td>1</td><td>Тауар ID</td></tr>
+                <tr><td>store_id</td><td>1</td><td>Дүкен ID</td></tr>
+                <tr><td>package_price</td><td>450</td><td>Қаптама бағасы</td></tr>
+                <tr><td>package_quantity</td><td>900</td><td>Қаптама мөлшері</td></tr>
+                <tr><td>package_unit</td><td>g</td><td>g, kg, ml, liter, piece</td></tr>
+                <tr><td>observation_date</td><td>2026-11-13</td><td>Бақылау күні</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if errors %}
+<div class="panel">
+    <h3>Импорт кезінде табылған қателер</h3>
+    {% for error in errors %}
+    <p class="danger-text">{{ error }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

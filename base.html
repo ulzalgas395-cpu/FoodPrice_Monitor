@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FoodPrice Monitor{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">₸</div>
+            <div>
+                <h2>FoodPrice</h2>
+                <small>MONITORING SYSTEM</small>
+            </div>
+        </div>
+
+        <div class="menu-title">БАСҚАРУ</div>
+
+        <nav>
+            <a href="{{ url_for('home') }}">⌂ <span>Басты бет</span></a>
+            <a href="{{ url_for('products_page') }}">▦ <span>Тауарлар</span></a>
+            <a href="{{ url_for('stores_page') }}">⌖ <span>Дүкендер</span></a>
+            <a href="{{ url_for('prices_page') }}">₸ <span>Бағалар</span></a>
+            <a href="{{ url_for('analytics_page') }}">▥ <span>Аналитика</span></a>
+            <a href="{{ url_for('official_analytics') }}">📈 <span>Ресми аналитика</span></a>
+            <a href="{{ url_for('official_data') }}">📊 <span>Ресми деректер</span></a>
+            <a href="{{ url_for('verification_page') }}">⚑ <span>Тексеру</span></a>
+            <a href="{{ url_for('import_page') }}">⇧ <span>Excel импорт</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="status-dot"></div>
+            Жүйе жұмыс істеп тұр
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <span class="breadcrumb">FoodPrice Monitor / </span>
+                <strong>{% block page_name %}Басты бет{% endblock %}</strong>
+            </div>
+
+            <a class="export-button" href="{{ url_for('export_page') }}">
+                ↓ Excel есебін жүктеу
+            </a>
+        </header>
+
+        <section class="content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+
+        </section>
+
+        <footer>
+            FoodPrice Monitor © 2026 · Әлеуметтік маңызы бар азық-түлік бағасын бақылау жүйесі
+        </footer>
+
+    </main>
+
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

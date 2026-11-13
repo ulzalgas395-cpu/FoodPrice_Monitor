@@ -1,0 +1,137 @@
+
+{% extends "base.html" %}
+
+{% block title %}Басты бет | FoodPrice Monitor{% endblock %}
+{% block page_name %}Басты бет{% endblock %}
+
+{% block content %}
+
+<div class="welcome">
+    <div>
+        <span class="eyebrow">МОНИТОРИНГ ПЛАТФОРМАСЫ</span>
+        <h1>Азық-түлік бағаларын<br>бір жерден бақылаңыз</h1>
+        <p>
+            Әлеуметтік маңызы бар азық-түлік тауарларының
+            бағасын жинау, салыстыру және талдау жүйесі.
+        </p>
+    </div>
+
+    <div class="welcome-icon">₸</div>
+</div>
+
+<div class="section-heading">
+    <div>
+        <h2>Жүйенің көрсеткіштері</h2>
+        <p>Деректер базасындағы ағымдағы ақпарат</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon purple">▦</div>
+        <span>Тіркелген тауарлар</span>
+        <h2>{{ products_count }}</h2>
+        <small>Тауар каталогы</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue">⌖</div>
+        <span>Сауда нүктелері</span>
+        <h2>{{ stores_count }}</h2>
+        <small>Дүкендер мен базарлар</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">₸</div>
+        <span>Баға жазбалары</span>
+        <h2>{{ prices_count }}</h2>
+        <small>Жиналған деректер</small>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon orange">⚑</div>
+        <span>Тексеруді қажет етеді</span>
+        <h2>{{ alerts_count }}</h2>
+        <small>Маманның қарауын күтуде</small>
+    </div>
+
+</div>
+
+<div class="two-columns">
+
+    <div class="panel">
+        <div class="panel-heading">
+            <h3>Соңғы баға жазбалары</h3>
+            <a href="{{ url_for('prices_page') }}">Барлығын көру →</a>
+        </div>
+
+        {% if recent_prices %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Тауар</th>
+                        <th>Дүкен</th>
+                        <th>Бағасы</th>
+                        <th>Күні</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_prices %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.store_name }}</td>
+                        <td><strong>{{ item.normalized_price }} ₸</strong></td>
+                        <td>{{ item.observation_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>▤</span>
+            <p>Әзірге баға жазбалары жоқ.</p>
+            <a class="primary-button" href="{{ url_for('prices_page') }}">
+                Баға енгізу
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <h3>Тексеру ескертулері</h3>
+            <a href="{{ url_for('verification_page') }}">Ашу →</a>
+        </div>
+
+        {% if recent_alerts %}
+            {% for alert in recent_alerts %}
+            <div class="alert-item">
+                <div class="alert-symbol">!</div>
+                <div>
+                    <strong>{{ alert.product_name }}</strong>
+                    <p>{{ alert.store_name }} · {{ alert.percentage_change }}%</p>
+                    <small>{{ alert.status }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <span>✓</span>
+                <p>Қазіргі уақытта тексеру жазбалары жоқ.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="quick-actions">
+    <a href="{{ url_for('products_page') }}">＋ Тауар қосу</a>
+    <a href="{{ url_for('stores_page') }}">＋ Дүкен қосу</a>
+    <a href="{{ url_for('prices_page') }}">＋ Баға енгізу</a>
+    <a href="{{ url_for('analytics_page') }}">▥ Аналитиканы ашу</a>
+</div>
+
+{% endblock %}

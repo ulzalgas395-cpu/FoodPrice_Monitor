@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Ресми аналитика | FoodPrice Monitor{% endblock %}
+
+{% block content %}
+<style>
+.official-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 13px;
+    padding: 20px;
+}
+.official-card small {
+    color: #64748b;
+    font-size: 13px;
+}
+.official-card h2 {
+    color: #15803d;
+    font-size: 26px;
+    margin: 10px 0 4px 0;
+}
+.official-card p {
+    margin: 0;
+    color: #334155;
+    font-weight: 500;
+}
+.official-filter-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 22px 0;
+}
+.official-select {
+    padding: 11px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    min-width: 220px;
+}
+.official-btn {
+    padding: 11px 22px;
+    background: #15803d;
+    color: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.official-btn:hover {
+    background: #166534;
+}
+.official-table-wrap {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 13px;
+}
+.official-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+.official-table th,
+.official-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+.official-table th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+}
+.official-table tbody tr:hover {
+    background: #f8fafc;
+}
+</style>
+
+<div style="padding: 24px;">
+
+    <h1 style="margin-bottom: 6px;">Ресми баға аналитикасы</h1>
+    <p style="color: #64748b; margin-top: 0;">Әртүрлі аймақтардағы азық-түлік бағаларын салыстыру</p>
+
+    <form method="GET" class="official-filter-form">
+        <select name="product" class="official-select">
+            {% if products %}
+                {% for product in products %}
+                    <option value="{{ product[0] }}"
+                        {% if selected_product == product[0] %}selected{% endif %}>
+                        {{ product[0] }}
+                    </option>
+                {% endfor %}
+            {% else %}
+                <option value="">Тауарлар табылмады</option>
+            {% endif %}
+        </select>
+
+        <select name="type" class="official-select">
+            <option value="national"
+                {% if selected_type == "national" %}selected{% endif %}>
+                Қазақстан қалалары
+            </option>
+            <option value="retail"
+                {% if selected_type == "retail" %}selected{% endif %}>
+                Қызылорда облысы — бөлшек сауда
+            </option>
+            <option value="market"
+                {% if selected_type == "market" %}selected{% endif %}>
+                Қызылорда облысы — базарлар
+            </option>
+        </select>
+
+        <button type="submit" class="official-btn">
+            Талдау
+        </button>
+    </form>
+
+    {% if rows %}
+
+    <div style="display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 15px;
+                margin-bottom: 25px;">
+
+        <div class="official-card">
+            <small>Ең жоғары орташа баға</small>
+            <h2>{{ "%.2f"|format(highest[1]) }} ₸</h2>
+            <p>{{ highest[0] }}</p>
+        </div>
+
+        <div class="official-card">
+            <small>Ең төмен орташа баға</small>
+            <h2>{{ "%.2f"|format(lowest[1]) }} ₸</h2>
+            <p>{{ lowest[0] }}</p>
+        </div>
+
+        <div class="official-card">
+            <small>Салыстырылған аймақтар</small>
+            <h2>{{ rows|length }}</h2>
+            <p>Барлық белсенді аймақ</p>
+        </div>
+
+    </div>
+
+    <div class="official-card" style="margin-bottom: 22px;">
+        <h3 style="margin-top: 0;">Аймақтар бойынша орташа баға</h3>
+        <div id="officialChart" style="width: 100%; height: 430px;"></div>
+    </div>
+
+    <div class="official-table-wrap">
+        <table class="official-table">
+            <thead>
+                <tr>
+                    <th>Аймақ</th>
+                    <th>Орташа баға</th>
+                    <th>Ең төмен</th>
+                    <th>Ең жоғары</th>
+                    <th>Жазбалар саны</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td><strong>{{ "%.2f"|format(row[1]) }} ₸</strong></td>
+                    <td>{{ "%.2f"|format(row[2]) }} ₸</td>
+                    <td>{{ "%.2f"|format(row[3]) }} ₸</td>
+                    <td>{{ row[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+        <div class="official-card" style="color: #64748b; text-align: center; padding: 40px;">
+            Таңдалған тауар бойынша деректер табылмады.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if rows %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const labels = {{ labels | tojson }};
+    const values = {{ average_prices | tojson }};
+
+    Plotly.newPlot("officialChart", [{
+        x: labels,
+        y: values,
+        type: "bar",
+        marker: {
+            color: "#15803d"
+        },
+        text: values.map(value => value.toFixed(2) + " ₸"),
+        textposition: "auto"
+    }], {
+        title: "Аймақтар бойынша баға салыстыру",
+        xaxis: {
+            title: "Аймақ",
+            automargin: true
+        },
+        yaxis: {
+            title: "Бағасы (теңге)",
+            automargin: true
+        },
+        margin: { t: 50, l: 60, r: 20, b: 80 }
+    }, {
+        responsive: true
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

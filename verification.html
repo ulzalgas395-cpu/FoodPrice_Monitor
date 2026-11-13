@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+{% block title %}Тексеру | FoodPrice{% endblock %}
+{% block page_name %}Баға өзгерістерін тексеру{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Тексеру орталығы</h1>
+    <p>Шекті мәннен асқан баға өзгерістері маманның қарауына жіберіледі.</p>
+</div>
+
+{% if alerts %}
+
+{% for a in alerts %}
+
+<div class="panel verification-card">
+
+    <div class="verification-top">
+        <div>
+            <span class="eyebrow">ТЕКСЕРУ ЖАЗБАСЫ #{{ a.id }}</span>
+            <h3>{{ a.product_name }}</h3>
+            <p>{{ a.store_name }} · {{ a.city }}</p>
+        </div>
+
+        <span class="status status-{{ a.status }}">
+            {{ a.status }}
+        </span>
+    </div>
+
+    <div class="comparison-grid">
+        <div>
+            <small>Алдыңғы баға</small>
+            <strong>{{ a.previous_price }} ₸</strong>
+        </div>
+
+        <div>
+            <small>Қазіргі баға</small>
+            <strong>{{ a.current_price }} ₸</strong>
+        </div>
+
+        <div>
+            <small>Өзгеріс</small>
+            <strong class="{% if a.percentage_change > 0 %}danger-text{% else %}success-text{% endif %}">
+                {{ a.percentage_change }}%
+            </strong>
+        </div>
+    </div>
+
+    <p class="reason">{{ a.reason }}</p>
+
+    <form method="POST">
+        <input type="hidden" name="verification_id" value="{{ a.id }}">
+
+        <label>Тексеру статусы</label>
+        <select name="status">
+            <option value="pending" {% if a.status == "pending" %}selected{% endif %}>
+                Күтуде
+            </option>
+            <option value="under_review" {% if a.status == "under_review" %}selected{% endif %}>
+                Қаралуда
+            </option>
+            <option value="verified" {% if a.status == "verified" %}selected{% endif %}>
+                Тексерілді
+            </option>
+            <option value="dismissed" {% if a.status == "dismissed" %}selected{% endif %}>
+                Негізсіз ескерту
+            </option>
+        </select>
+
+        <label>Маманның түсініктемесі</label>
+        <textarea name="specialist_comment"
+                  placeholder="Тексеру барысында анықталған ақпарат">{{ a.specialist_comment or '' }}</textarea>
+
+        <label>Қорытынды</label>
+        <textarea name="final_conclusion"
+                  placeholder="Қорытындыны енгізіңіз">{{ a.final_conclusion or '' }}</textarea>
+
+        <button type="submit" class="primary-button">
+            Тексеру нәтижесін сақтау
+        </button>
+    </form>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="panel empty-state">
+    <span>✓</span>
+    <h3>Тексеру жазбалары жоқ</h3>
+    <p>Жүйеде әзірге шекті мәннен асқан баға өзгерісі тіркелмеген.</p>
+</div>
+
+{% endif %}
+
+<div class="notice">
+    <strong>Ескерту:</strong>
+    баға өзгерісінің жоғары болуы өздігінен заң бұзушылықты білдірмейді.
+    Әрбір жағдай маман тарапынан тексерілуі керек.
+</div>
+
+{% endblock %}

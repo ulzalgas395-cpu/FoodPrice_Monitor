@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Ресми деректер | FoodPrice Monitor{% endblock %}
+
+{% block content %}
+
+<style>
+.official-page {
+    padding: 24px;
+}
+.official-heading {
+    margin-bottom: 22px;
+}
+.official-heading h1 {
+    font-size: 27px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+.official-heading p {
+    color: #64748b;
+    margin: 0;
+}
+.official-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.official-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 13px;
+    padding: 20px;
+}
+.official-card small {
+    color: #64748b;
+}
+.official-card h2 {
+    margin: 10px 0 0;
+    color: #15803d;
+    font-size: 27px;
+}
+.official-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 18px;
+    border-radius: 13px;
+    margin-bottom: 20px;
+}
+.official-filter select {
+    min-width: 180px;
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+}
+.official-filter button {
+    background: #15803d;
+    color: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 22px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.official-filter button:hover {
+    background: #166534;
+}
+.official-export-btn {
+    padding: 11px 18px;
+    background: #166534;
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    transition: background 0.2s;
+}
+.official-export-btn:hover {
+    background: #14532d;
+}
+.official-table-wrap {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 13px;
+}
+.official-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+.official-table th, .official-table td {
+    padding: 13px 15px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+.official-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+.official-table tr:hover {
+    background: #f8fafc;
+}
+.official-source {
+    color: #15803d;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 500;
+}
+.official-source:hover {
+    text-decoration: underline;
+}
+.official-type {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 500;
+}
+.official-empty {
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+}
+</style>
+
+<div class="official-page">
+
+    <div class="official-heading">
+        <h1>Ресми статистикалық деректер</h1>
+        <p>Қазақстан Республикасы Ұлттық статистика бюросының азық-түлік бағалары</p>
+    </div>
+
+    <div class="official-cards">
+        <div class="official-card">
+            <small>Жалпы ресми жазбалар</small>
+            <h2>{{ total }}</h2>
+        </div>
+
+        <div class="official-card">
+            <small>Тауар түрлері</small>
+            <h2>{{ products|length }}</h2>
+        </div>
+
+        <div class="official-card">
+            <small>Аймақтар мен қалалар</small>
+            <h2>{{ areas|length }}</h2>
+        </div>
+
+        <div class="official-card">
+            <small>Көрсетілген нәтижелер</small>
+            <h2>{{ records|length }}</h2>
+        </div>
+    </div>
+
+    <form method="GET" class="official-filter">
+
+        <select name="product">
+            <option value="">Барлық тауарлар</option>
+            {% for item in products %}
+                <option value="{{ item[0] }}"
+                    {% if selected_product == item[0] %}selected{% endif %}>
+                    {{ item[0] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="area">
+            <option value="">Барлық аймақтар</option>
+            {% for item in areas %}
+                <option value="{{ item[0] }}"
+                    {% if selected_area == item[0] %}selected{% endif %}>
+                    {{ item[0] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="type">
+            <option value="">Барлық дерек түрі</option>
+            <option value="retail"
+                {% if selected_type == "retail" %}selected{% endif %}>
+                Бөлшек сауда
+            </option>
+            <option value="market"
+                {% if selected_type == "market" %}selected{% endif %}>
+                Базар бағалары
+            </option>
+            <option value="national"
+                {% if selected_type == "national" %}selected{% endif %}>
+                Қазақстан бойынша
+            </option>
+        </select>
+
+        <button type="submit">Сүзгіні қолдану</button>
+        
+        <a href="{{ url_for('official_data') }}"
+           style="color: #64748b; text-decoration: none; font-size: 14px;">
+            Тазарту
+        </a>
+
+        <a href="{{ url_for('export_official') }}" class="official-export-btn">
+            📊 Excel жүктеу
+        </a>
+    </form>
+
+    <div class="official-table-wrap">
+        <table class="official-table">
+            <thead>
+                <tr>
+                    <th>Тауар</th>
+                    <th>Аймақ</th>
+                    <th>Бағасы</th>
+                    <th>Кезең</th>
+                    <th>Дерек түрі</th>
+                    <th>Дереккөз</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in records %}
+                <tr>
+                    <td><strong>{{ item[0] }}</strong></td>
+                    <td>{{ item[1] }}</td>
+                    <td>
+                        <strong>{{ "%.2f"|format(item[2]) }} ₸</strong>
+                        / {{ item[3] }}
+                    </td>
+                    <td>{{ item[5] }}</td>
+                    <td>
+                        {% if item[6] == "retail" %}
+                            <span class="official-type">Бөлшек сауда</span>
+                        {% elif item[6] == "market" %}
+                            <span class="official-type">Базар</span>
+                        {% else %}
+                            <span class="official-type">Ұлттық статистика</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="official-source"
+                           href="{{ item[8] }}"
+                           target="_blank" rel="noopener">
+                            Ұлттық статистика бюросы ↗
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="official-empty">
+                        Таңдалған сүзгі бойынша деректер табылмады.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p style="color: #64748b; font-size: 13px; margin-top: 15px;">
+        Ескерту: бұл бетте ресми статистикалық орташа бағалар көрсетіледі. 
+        Олар жеке дүкеннің нақты бағасы болып саналмайды.
+    </p>
+
+</div>
+
+{% endblock %}

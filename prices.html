@@ -1,0 +1,138 @@
+
+{% extends "base.html" %}
+{% block title %}Бағалар | FoodPrice{% endblock %}
+{% block page_name %}Баға мониторингі{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Бағаларды тіркеу</h1>
+    <p>Қаптама бағасын енгізіңіз. Жүйе стандартты өлшемдегі бағасын автоматты есептейді.</p>
+</div>
+
+<div class="panel form-panel">
+    <h3>＋ Жаңа баға енгізу</h3>
+
+    {% if products and stores %}
+
+    <form method="POST" class="form-grid">
+
+        <div>
+            <label>Тауар</label>
+            <select name="product_id" required>
+                {% for p in products %}
+                <option value="{{ p.id }}">
+                    {{ p.name }} ({{ p.standard_unit }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Сауда нүктесі</label>
+            <select name="store_id" required>
+                {% for s in stores %}
+                <option value="{{ s.id }}">
+                    {{ s.name }} — {{ s.city }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Қаптаманың бағасы (₸)</label>
+            <input type="number" name="package_price"
+                   min="0.01" step="0.01" placeholder="450" required>
+        </div>
+
+        <div>
+            <label>Қаптаманың мөлшері</label>
+            <input type="number" name="package_quantity"
+                   min="0.001" step="0.001" placeholder="900" required>
+        </div>
+
+        <div>
+            <label>Қаптама өлшемі</label>
+            <select name="package_unit" required>
+                <option value="g">Грамм (g)</option>
+                <option value="kg">Килограмм (kg)</option>
+                <option value="ml">Миллилитр (ml)</option>
+                <option value="liter">Литр</option>
+                <option value="piece">Дана</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Бақылау күні</label>
+            <input type="date" name="observation_date"
+                   value="{{ today }}" required>
+        </div>
+
+        <div>
+            <label>Дерек көзі</label>
+            <input name="source" value="Қолмен енгізілді">
+        </div>
+
+        <div>
+            <label>Түсініктеме</label>
+            <input name="comment" placeholder="Қосымша ақпарат">
+        </div>
+
+        <div class="full-width">
+            <button class="primary-button" type="submit">
+                Бағаны сақтау және есептеу
+            </button>
+        </div>
+
+    </form>
+
+    {% else %}
+        <div class="empty-state">
+            <p>Алдымен кемінде бір тауар және бір дүкен тіркеу қажет.</p>
+            <a href="{{ url_for('products_page') }}">Тауар қосу</a>
+            <a href="{{ url_for('stores_page') }}">Дүкен қосу</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="panel">
+    <div class="panel-heading">
+        <h3>Барлық баға жазбалары</h3>
+        <span class="count-badge">{{ prices|length }} жазба</span>
+    </div>
+
+    {% if prices %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Тауар</th>
+                    <th>Дүкен</th>
+                    <th>Қаптама бағасы</th>
+                    <th>Мөлшері</th>
+                    <th>Стандартты баға</th>
+                    <th>Күні</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in prices %}
+                <tr>
+                    <td>{{ p.product_name }}</td>
+                    <td>{{ p.store_name }}</td>
+                    <td>{{ p.package_price }} ₸</td>
+                    <td>{{ p.package_quantity }} {{ p.package_unit }}</td>
+                    <td><strong>{{ p.normalized_price }} ₸/{{ p.normalized_unit }}</strong></td>
+                    <td>{{ p.observation_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>Баға жазбалары әзірге жоқ.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

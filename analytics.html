@@ -1,0 +1,132 @@
+
+{% extends "base.html" %}
+{% block title %}Аналитика | FoodPrice{% endblock %}
+{% block page_name %}Аналитика{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Бағаларды талдау</h1>
+    <p>Тауар бағаларын салыстыру және статистикалық көрсеткіштерді қарау.</p>
+</div>
+
+<div class="panel">
+    <h3>Сүзгілер</h3>
+
+    <form method="GET" class="filter-form">
+
+        <div>
+            <label>Тауар</label>
+            <select name="product_id">
+                <option value="">Барлық тауар</option>
+                {% for p in products %}
+                <option value="{{ p.id }}"
+                    {% if selected_product == p.id|string %}selected{% endif %}>
+                    {{ p.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Қала</label>
+            <select name="city">
+                <option value="">Барлық қала</option>
+                {% for city in cities %}
+                <option value="{{ city }}"
+                    {% if selected_city == city %}selected{% endif %}>
+                    {{ city }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="primary-button" type="submit">Талдау</button>
+    </form>
+</div>
+
+{% if statistics %}
+
+<div class="section-heading">
+    <div>
+        <h2>{{ statistics.product_name }}</h2>
+        <p>Баға статистикасы · {{ statistics.count }} жазба</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>Ең төмен баға</span>
+        <h2>{{ statistics.minimum }}</h2>
+        <small>₸ / {{ statistics.unit }}</small>
+    </div>
+
+    <div class="stat-card">
+        <span>Медиана</span>
+        <h2>{{ statistics.median }}</h2>
+        <small>₸ / {{ statistics.unit }}</small>
+    </div>
+
+    <div class="stat-card">
+        <span>Орташа баға</span>
+        <h2>{{ statistics.average }}</h2>
+        <small>₸ / {{ statistics.unit }}</small>
+    </div>
+
+    <div class="stat-card">
+        <span>Ең жоғары баға</span>
+        <h2>{{ statistics.maximum }}</h2>
+        <small>₸ / {{ statistics.unit }}</small>
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="empty-state panel">
+    <span>▥</span>
+    <p>Таңдалған сүзгі бойынша талдауға жеткілікті дерек жоқ.</p>
+</div>
+
+{% endif %}
+
+<div class="panel">
+    <h3>Сауда нүктелері бойынша баға көрінісі</h3>
+
+    {% if chart_values %}
+    <div id="priceChart" style="height:400px;"></div>
+    {% else %}
+    <div class="empty-state">
+        <p>График құру үшін алдымен баға енгізіңіз.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ chart_labels | tojson }};
+const values = {{ chart_values | tojson }};
+
+if (values.length > 0) {
+    Plotly.newPlot("priceChart", [{
+        x: labels,
+        y: values,
+        type: "bar",
+        text: values.map(v => v + " ₸"),
+        textposition: "auto"
+    }], {
+        margin: {t: 25, l: 55, r: 20, b: 100},
+        xaxis: {title: "Сауда нүктесі"},
+        yaxis: {title: "Баға (₸)"},
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(0,0,0,0)"
+    }, {
+        responsive: true,
+        displayModeBar: false
+    });
+}
+</script>
+{% endblock %}

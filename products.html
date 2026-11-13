@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+{% block title %}Тауарлар | FoodPrice{% endblock %}
+{% block page_name %}Тауарлар{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Тауарлар каталогы</h1>
+    <p>Мониторингке алынған азық-түлік тауарларын басқару.</p>
+</div>
+
+<div class="two-columns form-layout">
+
+    <div class="panel">
+        <h3>＋ Жаңа тауар қосу</h3>
+
+        <form method="POST">
+            <label>Тауар атауы</label>
+            <input name="name" placeholder="Мысалы: Ұн" required>
+
+            <label>Санаты</label>
+            <select name="category" required>
+                <option value="">Санатты таңдаңыз</option>
+                <option>Ұн және нан өнімдері</option>
+                <option>Ет өнімдері</option>
+                <option>Сүт өнімдері</option>
+                <option>Жұмыртқа</option>
+                <option>Көкөністер</option>
+                <option>Қант және тұз</option>
+                <option>Басқа</option>
+            </select>
+
+            <label>Стандартты өлшем бірлігі</label>
+            <select name="standard_unit" required>
+                <option value="kg">Килограмм (кг)</option>
+                <option value="liter">Литр</option>
+                <option value="piece">Дана</option>
+            </select>
+
+            <label>Сипаттамасы</label>
+            <textarea name="description" placeholder="Қосымша ақпарат"></textarea>
+
+            <button class="primary-button" type="submit">
+                Тауарды сақтау
+            </button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h3>Тіркелген тауарлар</h3>
+
+        {% if products %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Атауы</th>
+                        <th>Санаты</th>
+                        <th>Өлшемі</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ p.name }}</strong></td>
+                        <td>{{ p.category }}</td>
+                        <td>{{ p.standard_unit }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>▦</span>
+            <p>Тауарлар әлі қосылмаған.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

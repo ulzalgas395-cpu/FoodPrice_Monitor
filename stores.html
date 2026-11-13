@@ -1,0 +1,84 @@
+
+{% extends "base.html" %}
+{% block title %}Дүкендер | FoodPrice{% endblock %}
+{% block page_name %}Сауда нүктелері{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <h1>Сауда нүктелері</h1>
+    <p>Бағалар жиналатын дүкендер мен базарлардың тізімі.</p>
+</div>
+
+<div class="two-columns form-layout">
+
+    <div class="panel">
+        <h3>＋ Сауда нүктесін тіркеу</h3>
+
+        <form method="POST">
+            <label>Дүкеннің атауы</label>
+            <input name="name" placeholder="Мысалы: Small Market" required>
+
+            <label>Сауда нүктесінің түрі</label>
+            <select name="store_type" required>
+                <option value="">Таңдаңыз</option>
+                <option>Супермаркет</option>
+                <option>Шағын дүкен</option>
+                <option>Базар</option>
+                <option>Көтерме сауда</option>
+            </select>
+
+            <label>Облыс / өңір</label>
+            <input name="region" placeholder="Қызылорда облысы" required>
+
+            <label>Қала</label>
+            <input name="city" placeholder="Қызылорда" required>
+
+            <label>Аудан</label>
+            <input name="district" placeholder="Аудан атауы">
+
+            <label>Мекенжай</label>
+            <input name="address" placeholder="Көше, ғимарат">
+
+            <button class="primary-button" type="submit">
+                Сауда нүктесін сақтау
+            </button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h3>Тіркелген сауда нүктелері</h3>
+
+        {% if stores %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Атауы</th>
+                        <th>Түрі</th>
+                        <th>Қала</th>
+                        <th>Мекенжай</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in stores %}
+                    <tr>
+                        <td><strong>{{ s.name }}</strong></td>
+                        <td>{{ s.store_type }}</td>
+                        <td>{{ s.city }}</td>
+                        <td>{{ s.address or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>⌖</span>
+            <p>Сауда нүктелері әлі тіркелмеген.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

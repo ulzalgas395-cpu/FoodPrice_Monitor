@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+{% block title %}404 | FoodPrice{% endblock %}
+{% block page_name %}Бет табылмады{% endblock %}
+
+{% block content %}
+<div class="panel empty-state">
+    <h1>404</h1>
+    <h2>Бет табылмады</h2>
+    <p>Сіз іздеген бет жүйеде жоқ.</p>
+    <a class="primary-button" href="{{ url_for('home') }}">Басты бетке оралу</a>
+</div>
+{% endblock %}
